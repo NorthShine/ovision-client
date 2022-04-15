@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/ovision-client/static/css/main.8310e1c5.css",
-    "main.js": "/ovision-client/static/js/main.ab362122.js",
+    "main.css": "/ovision-client/static/css/main.d4b9c7b9.css",
+    "main.js": "/ovision-client/static/js/main.d2924b3a.js",
     "index.html": "/ovision-client/index.html",
-    "main.8310e1c5.css.map": "/ovision-client/static/css/main.8310e1c5.css.map",
-    "main.ab362122.js.map": "/ovision-client/static/js/main.ab362122.js.map"
+    "main.d4b9c7b9.css.map": "/ovision-client/static/css/main.d4b9c7b9.css.map",
+    "main.d2924b3a.js.map": "/ovision-client/static/js/main.d2924b3a.js.map"
   },
   "entrypoints": [
-    "static/css/main.8310e1c5.css",
-    "static/js/main.ab362122.js"
+    "static/css/main.d4b9c7b9.css",
+    "static/js/main.d2924b3a.js"
   ]
 }
