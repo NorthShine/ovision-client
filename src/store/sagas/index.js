@@ -7,10 +7,14 @@ export default function* () {
   // grouping all sagas
   // yield all([fork(webSocketSaga)]);
 
-  const connectAction = yield take(INIT_WEBSOCKET);
-  while (connectAction) {
-    const wsTask = yield fork(webSocketSaga, connectAction);
+  const wsTransferInverval = {
+    value: undefined
+  };
+
+  while (yield take(INIT_WEBSOCKET)) {
+    const wsTask = yield fork(webSocketSaga, wsTransferInverval);
     yield take(CANCEL_WEBSOCKET);
+    clearInterval(wsTransferInverval.value);
     yield cancel(wsTask);
   }
 }

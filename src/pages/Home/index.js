@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Button, Col, Container, Row, Spinner } from 'react-bootstrap';
-import api from '../../api';
 import { useDispatch, useSelector } from 'react-redux';
 import './styles.scss';
 import { CANCEL_WEBSOCKET, INIT_WEBSOCKET } from '../../store/actionTypes';
@@ -74,9 +73,7 @@ export const Home = () => {
   const startWebsocket = async () => {
     try {
       setStreamLoader(true);
-      const res = await api.getUniqueRoomId();
-      const roomId = res.data.room_id;
-      dispatch({ type: INIT_WEBSOCKET, payload: roomId });
+      dispatch({ type: INIT_WEBSOCKET });
     } catch (err) {
       throw err;
     }

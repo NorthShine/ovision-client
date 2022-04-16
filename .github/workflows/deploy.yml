@@ -1,4 +1,4 @@
-name: build
+name: Deploy Client
 
 on:
   push:
@@ -8,34 +8,43 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v1
-      - name: Use Node.js 14
-        uses: actions/setup-node@v1
-        with:
-          node-version: '14'
-      - name: Publish to Github Packages Registry
-        uses: elgohr/Publish-Docker-Github-Action@v4
-        with:
-          name: paulbraam/ovision-client/ovision-client
-          registry: docker.pkg.github.com
-          username: ${{ secrets.GITHUB_USERNAME }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          dockerfile: Dockerfile
-          tags: latest
-      - name: Deploy package to VPS
-        uses: appleboy/ssh-action@master
+
+      - name: Copy repository contents via scp
+        uses: appleboy/scp-action@master
         env:
-          GITHUB_USERNAME: ${{ secrets.GITHUB_USERNAME }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HOST: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          PORT: ${{ secrets.PORT }}
+          KEY: ${{ secrets.SSHKEY }}
+        with:
+          source: '.'
+          target: '/var/www/app'
+
+      - name: Creating .env file
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          port: ${{ secrets.PORT }}
-          envs: GITHUB_USERNAME, GITHUB_TOKEN
+          USERNAME: ${{ secrets.USERNAME }}
+          PORT: ${{ secrets.PORT }}
+          KEY: ${{ secrets.SSHKEY }}
+          envs: REACT_APP_API_URL, REACT_APP_WEBSOCKET_URL
           script: |
-            docker stop $(docker ps -a -q)
-            docker login docker.pkg.github.com -u $GITHUB_USERNAME -p $GITHUB_TOKEN
-            docker pull docker.pkg.github.com/paulbraam/ovision-client/ovision-client:latest
-            docker run -dit -p 80:80 docker.pkg.github.com/paulbraam/ovision-client/ovision-client:latest
+            cd /var/www/app
+            touch .env
+            echo REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }} >> .env
+            echo REACT_APP_WEBSOCKET_URL=${{ secrets.REACT_APP_WEBSOCKET_URL }} >> .env
+            cat .env
+      - name: Building the Client app
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          PORT: ${{ secrets.PORT }}
+          KEY: ${{ secrets.SSHKEY }}
+          envs: REACT_APP_API_URL, REACT_APP_WEBSOCKET_URL
+          script: |
+            npm run build
+            pm2 serve build/3000 --spa
