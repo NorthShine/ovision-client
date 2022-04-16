@@ -2,7 +2,6 @@ import { call, put, take, all } from 'redux-saga/effects';
 import { eventChannel, END } from 'redux-saga';
 import { setStreamSource } from '../actionCreators/stream.actionCreators';
 import { FPS } from '../../constants';
-import { Buffer } from 'buffer';
 
 const createWebSocketConnection = roomId => {
   return new Promise((resolve, reject) => {
@@ -28,6 +27,7 @@ const initWebsocketChannel = (socket, roomId, stream) => {
     };
 
     socket.onclose = () => {
+      console.log('Connection closed');
       emit(END);
     };
 
