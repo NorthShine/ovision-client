@@ -1,5 +1,6 @@
 import { Home } from '../pages/Home';
 import { MainLayout } from '../layouts/MainLayout';
+import { Room } from '../pages/Room';
 // import { PrivateElement } from './PrivateElement';
 // import { Outlet } from 'react-router-dom';
 
@@ -16,6 +17,10 @@ export const routes = [
         // children: [
         //   { path: '/', element: <Home /> },
         // ]
+      },
+      {
+        path: '/:roomId',
+        element: <Room />
       }
     ]
   }

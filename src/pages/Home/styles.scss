@@ -1,22 +1,3 @@
 .Home {
   width: 100vw;
-
-  .Home__video {
-    min-height: 500px;
-    min-width: 500px;
-    width: 100%;
-    margin: auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 1px solid #e2e2e2;
-  }
-
-  .Home__buttons {
-    display: flex;
-    justify-content: center;
-    & > * {
-      margin: 10px;
-    }
-  }
 }
