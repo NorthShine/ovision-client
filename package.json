@@ -46,6 +46,7 @@
     ]
   },
   "devDependencies": {
+    "buffer": "^6.0.3",
     "sass": "^1.50.0"
   }
 }

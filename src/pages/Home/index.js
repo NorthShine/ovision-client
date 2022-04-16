@@ -4,20 +4,56 @@ import api from '../../api';
 import { useDispatch, useSelector } from 'react-redux';
 import './styles.scss';
 import { CANCEL_WEBSOCKET, INIT_WEBSOCKET } from '../../store/actionTypes';
+import { blobToBase64 } from '../../utils';
+import { FPS } from '../../constants';
 
 export const Home = () => {
   const canvasRef = useRef(null);
   const dispatch = useDispatch();
-  const stream = useSelector(state => state.stream);
+  // const stream = useSelector(state => state.stream);
   const [streamLoader, setStreamLoader] = useState(false);
+  const [stream, setStream] = useState();
+  const [resolution, setResolution] = useState({
+    width: 0,
+    height: 0
+  });
+
+  // useEffect(() => {
+  //   navigator.mediaDevices.getUserMedia(videoConstraints).then(stream => {
+  //     setInterval(async () => {
+  //       try {
+  //         if (stream) {
+  //           const [track] = stream.getVideoTracks();
+  //           const imageCapture = new ImageCapture(track);
+  //           const frame = await imageCapture.grabFrame();
+  //           setResolution(state => {
+  //             return {
+  //               width: frame.width,
+  //               height: frame.height
+  //             };
+  //           });
+  //           const canvas = canvasRef.current;
+  //           if (canvas) {
+  //             const context = canvas.getContext('2d');
+  //             context.drawImage(frame, 10, 10);
+  //           }
+  //         }
+  //       } catch (err) {
+  //         console.log(err);
+  //       }
+  //     }, 1000 / FPS);
+  //   });
+  // }, []);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    const image = new Image();
-    image.onload = function () {
-      canvas.drawImage(image, 0, 0);
-    };
-    image.src = stream.source;
+    if (stream) {
+      console.log(stream);
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const context = canvas.getContext('2d');
+        context.drawImage(stream.source, 10, 10);
+      }
+    }
   }, [stream]);
 
   const startWebsocket = async () => {
@@ -39,8 +75,13 @@ export const Home = () => {
 
   return (
     <div className="Home d-flex justify-content-center flex-column">
-      {!streamLoader || stream.source ? (
-        <canvas className="Home__video" ref={canvasRef} />
+      {!streamLoader || stream?.source ? (
+        <canvas
+          className="Home__video"
+          height={resolution.height}
+          width={resolution.width}
+          ref={canvasRef}
+        />
       ) : (
         <div className="Home__video">
           <Spinner animation="grow" variant="primary" />

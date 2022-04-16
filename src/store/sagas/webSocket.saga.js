@@ -2,17 +2,20 @@ import { call, put, take, all } from 'redux-saga/effects';
 import { eventChannel, END } from 'redux-saga';
 import { setStreamSource } from '../actionCreators/stream.actionCreators';
 import { FPS } from '../../constants';
-import { blobToBase64 } from '../../utils';
+import { Buffer } from 'buffer';
 
 const createWebSocketConnection = roomId => {
   return new Promise((resolve, reject) => {
-    const socket = new WebSocket(`${process.env.REACT_APP_URL}/ws_a/${roomId}`);
+    const socket = new WebSocket(
+      `${process.env.REACT_APP_WEBSOCKET_URL}ws_a/${roomId}`
+    );
 
     socket.onopen = function () {
       resolve(socket);
     };
 
     socket.onerror = function (event) {
+      console.log(event);
       reject(event);
     };
   });
@@ -32,8 +35,8 @@ const initWebsocketChannel = (socket, roomId, stream) => {
       const [track] = stream.getVideoTracks();
       const imageCapture = new ImageCapture(track);
       const frame = await imageCapture.takePhoto();
-      const buffer = await blobToBase64(frame);
-      socket.send(buffer);
+      socket.send(frame);
+      console.log('frame sent');
     }, 1000 / FPS);
 
     return () => {

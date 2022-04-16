@@ -2,8 +2,8 @@
   width: 100vw;
 
   .Home__video {
-    height: 500px;
-    width: 500px;
+    min-height: 500px;
+    min-width: 500px;
     margin: auto;
     display: flex;
     justify-content: center;

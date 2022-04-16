@@ -2,7 +2,7 @@ import axios from 'axios';
 
 class Api {
   fetcher = axios.create({
-    baseURL: process.env.REACT_APP_URL
+    baseURL: process.env.REACT_APP_API_URL
   });
 
   getUniqueRoomId() {
