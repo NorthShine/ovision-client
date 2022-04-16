@@ -1,3 +1,17 @@
-.Home {
-  width: 100vw;
+.Home {  width: 100vw;
+  overflow-x: hidden;
+  background: url('../../assets/images/Soft.jpg');
+  height: calc(100vh - 56px);
+}
+.WelcomeHPage {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 50px;
+}
+
+.Home__row {
+}
+.ListGroup {
+  margin-top: 1px;
+  background: wheat;
 }
