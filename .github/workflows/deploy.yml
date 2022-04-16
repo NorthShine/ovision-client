@@ -46,5 +46,6 @@ jobs:
           KEY: ${{ secrets.SSHKEY }}
           envs: REACT_APP_API_URL, REACT_APP_WEBSOCKET_URL
           script: |
+            cd /var/www/app
             npm run build
             pm2 serve build/3000 --spa
