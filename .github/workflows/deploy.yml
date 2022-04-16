@@ -20,7 +20,7 @@ jobs:
           PORT: ${{ secrets.PORT }}
           KEY: ${{ secrets.SSHKEY }}
         with:
-          source: '.'
+          source: './client'
           target: '/var/www/app'
 
       - name: Creating .env file
@@ -32,7 +32,7 @@ jobs:
           KEY: ${{ secrets.SSHKEY }}
           envs: REACT_APP_API_URL, REACT_APP_WEBSOCKET_URL
           script: |
-            cd /var/www/app
+            cd /var/www/app/client
             touch .env
             echo REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }} >> .env
             echo REACT_APP_WEBSOCKET_URL=${{ secrets.REACT_APP_WEBSOCKET_URL }} >> .env
@@ -46,6 +46,6 @@ jobs:
           KEY: ${{ secrets.SSHKEY }}
           envs: REACT_APP_API_URL, REACT_APP_WEBSOCKET_URL
           script: |
-            cd /var/www/app
+            cd /var/www/app/client
             npm run build
             pm2 serve build/3000 --spa
