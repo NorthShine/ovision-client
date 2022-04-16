@@ -20,8 +20,8 @@ jobs:
           PORT: ${{ secrets.PORT }}
           KEY: ${{ secrets.SSHKEY }}
         with:
-          source: './*'
-          target: '/var/www/app'
+          source: '.'
+          target: '/home/paul/app'
 
       - name: Creating .env file
         uses: appleboy/ssh-action@master
@@ -32,7 +32,7 @@ jobs:
           KEY: ${{ secrets.SSHKEY }}
           envs: REACT_APP_API_URL, REACT_APP_WEBSOCKET_URL
           script: |
-            cd /var/www/app
+            cd /home/paul/app
             touch .env
             echo REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }} >> .env
             echo REACT_APP_WEBSOCKET_URL=${{ secrets.REACT_APP_WEBSOCKET_URL }} >> .env
@@ -46,6 +46,6 @@ jobs:
           KEY: ${{ secrets.SSHKEY }}
           envs: REACT_APP_API_URL, REACT_APP_WEBSOCKET_URL
           script: |
-            cd /var/www/app
+            cd /home/paul/app
             npm run build
             pm2 serve build/3000 --spa
