@@ -1,7 +1,8 @@
-import { call, put, take, all } from 'redux-saga/effects';
+import { call, put, take, all, select } from 'redux-saga/effects';
 import { eventChannel, END } from 'redux-saga';
 import { setStreamSource } from '../actionCreators/stream.actionCreators';
 import { FPS } from '../../constants';
+// import { Buffer } from 'buffer';
 
 const createWebSocketConnection = roomId => {
   return new Promise((resolve, reject) => {
@@ -20,10 +21,17 @@ const createWebSocketConnection = roomId => {
   });
 };
 
-const initWebsocketChannel = (socket, roomId, stream) => {
+const initWebsocketChannel = (socket, roomId, wsTransferInverval, stream) => {
   return eventChannel(emit => {
+    // setInterval(() => {
+    //   const result = window.btoa('ping');
+    //   const blob = new Blob([result], {
+    //     type: 'text/plain'
+    //   });
+    //   socket.send(blob);
+    // }, 5000);
+
     socket.onmessage = event => {
-      console.log(1);
       emit(event.data);
     };
 
@@ -32,28 +40,21 @@ const initWebsocketChannel = (socket, roomId, stream) => {
       emit(END);
     };
 
-    const intervalId = setInterval(async () => {
+    wsTransferInverval.value = setInterval(async () => {
       const [track] = stream.getVideoTracks();
       const imageCapture = new ImageCapture(track);
       const frame = await imageCapture.grabFrame();
       const canvas = document.createElement('canvas');
-      // resize it to the size of our ImageBitmap
       canvas.width = frame.width;
       canvas.height = frame.height;
-      // try to get a bitmaprenderer context
-      let ctx = canvas.getContext('bitmaprenderer');
+      const ctx = canvas.getContext('bitmaprenderer');
       if (ctx) {
-        // transfer the ImageBitmap to it
         ctx.transferFromImageBitmap(frame);
       } else {
-        // in case someone supports createImageBitmap only
-        // twice in memory...
         canvas.getContext('2d').drawImage(frame, 0, 0);
       }
-      // get it back as a Blob
       canvas.toBlob(blob => {
-        if (socket.bufferedAmount === 0) {
-          console.log(blob);
+        if (socket.bufferedAmount < 2) {
           socket.send(blob);
           console.log('frame sent');
         }
@@ -62,7 +63,7 @@ const initWebsocketChannel = (socket, roomId, stream) => {
 
     return () => {
       socket.onmessage = null;
-      clearInterval(intervalId);
+      clearInterval(wsTransferInverval.value);
     };
   });
 };
@@ -82,15 +83,18 @@ const createStream = async () => {
   }
 };
 
-export function* webSocketSaga(connectAction) {
+export function* webSocketSaga(wsTransferInverval) {
   try {
-    const { payload: roomId } = connectAction;
+    const {
+      stream: { roomId }
+    } = yield select();
     const socket = yield call(createWebSocketConnection, roomId);
     const stream = yield call(createStream);
     const webSocketChannel = yield call(
       initWebsocketChannel,
       socket,
       roomId,
+      wsTransferInverval,
       stream
     );
     while (true) {
