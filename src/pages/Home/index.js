@@ -19,30 +19,34 @@ export const Home = () => {
   });
 
   // useEffect(() => {
-  //   navigator.mediaDevices.getUserMedia(videoConstraints).then(stream => {
-  //     setInterval(async () => {
-  //       try {
-  //         if (stream) {
-  //           const [track] = stream.getVideoTracks();
-  //           const imageCapture = new ImageCapture(track);
-  //           const frame = await imageCapture.grabFrame();
-  //           setResolution(state => {
-  //             return {
-  //               width: frame.width,
-  //               height: frame.height
-  //             };
-  //           });
-  //           const canvas = canvasRef.current;
-  //           if (canvas) {
-  //             const context = canvas.getContext('2d');
-  //             context.drawImage(frame, 10, 10);
+  //   navigator.mediaDevices
+  //     .getUserMedia({
+  //       video: true
+  //     })
+  //     .then(stream => {
+  //       setInterval(async () => {
+  //         try {
+  //           if (stream) {
+  //             const [track] = stream.getVideoTracks();
+  //             const imageCapture = new ImageCapture(track);
+  //             const frame = await imageCapture.grabFrame();
+  //             setResolution(state => {
+  //               return {
+  //                 width: frame.width,
+  //                 height: frame.height
+  //               };
+  //             });
+  //             const canvas = canvasRef.current;
+  //             if (canvas) {
+  //               const context = canvas.getContext('2d');
+  //               context.drawImage(frame, 10, 10);
+  //             }
   //           }
+  //         } catch (err) {
+  //           console.log(err);
   //         }
-  //       } catch (err) {
-  //         console.log(err);
-  //       }
-  //     }, 1000 / FPS);
-  //   });
+  //       }, 1000 / FPS);
+  //     });
   // }, []);
 
   useEffect(() => {
