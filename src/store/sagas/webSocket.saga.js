@@ -23,6 +23,7 @@ const createWebSocketConnection = roomId => {
 const initWebsocketChannel = (socket, roomId, stream) => {
   return eventChannel(emit => {
     socket.onmessage = event => {
+      console.log(1);
       emit(event.data);
     };
 
@@ -34,9 +35,29 @@ const initWebsocketChannel = (socket, roomId, stream) => {
     const intervalId = setInterval(async () => {
       const [track] = stream.getVideoTracks();
       const imageCapture = new ImageCapture(track);
-      const frame = await imageCapture.takePhoto();
-      socket.send(frame);
-      console.log('frame sent');
+      const frame = await imageCapture.grabFrame();
+      const canvas = document.createElement('canvas');
+      // resize it to the size of our ImageBitmap
+      canvas.width = frame.width;
+      canvas.height = frame.height;
+      // try to get a bitmaprenderer context
+      let ctx = canvas.getContext('bitmaprenderer');
+      if (ctx) {
+        // transfer the ImageBitmap to it
+        ctx.transferFromImageBitmap(frame);
+      } else {
+        // in case someone supports createImageBitmap only
+        // twice in memory...
+        canvas.getContext('2d').drawImage(frame, 0, 0);
+      }
+      // get it back as a Blob
+      canvas.toBlob(blob => {
+        if (socket.bufferedAmount === 0) {
+          console.log(blob);
+          socket.send(blob);
+          console.log('frame sent');
+        }
+      });
     }, 1000 / FPS);
 
     return () => {
