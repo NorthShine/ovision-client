@@ -4,6 +4,7 @@ import api from '../../api';
 import { useDispatch, useSelector } from 'react-redux';
 import './styles.scss';
 import { CANCEL_WEBSOCKET, INIT_WEBSOCKET } from '../../store/actionTypes';
+import { FPS } from '../../constants';
 
 export const Home = () => {
   const canvasRef = useRef(null);
@@ -15,6 +16,37 @@ export const Home = () => {
     width: 0,
     height: 0
   });
+
+  useEffect(() => {
+    navigator.mediaDevices
+      .getUserMedia({
+        video: true
+      })
+      .then(stream => {
+        setInterval(async () => {
+          try {
+            if (stream) {
+              const [track] = stream.getVideoTracks();
+              const imageCapture = new ImageCapture(track);
+              const frame = await imageCapture.grabFrame();
+              setResolution(state => {
+                return {
+                  width: frame.width,
+                  height: frame.height
+                };
+              });
+              const canvas = liveVideoRef.current;
+              if (canvas) {
+                const context = canvas.getContext('2d');
+                context.drawImage(frame, 10, 10);
+              }
+            }
+          } catch (err) {
+            console.log(err);
+          }
+        }, 1000 / FPS);
+      });
+  }, []);
 
   useEffect(() => {
     if (stream?.source) {
@@ -42,15 +74,6 @@ export const Home = () => {
   const startWebsocket = async () => {
     try {
       setStreamLoader(true);
-      const liveStream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: false
-      });
-      const video = liveVideoRef.current;
-      if (video) {
-        video.src = liveStream;
-        video.play();
-      }
       const res = await api.getUniqueRoomId();
       const roomId = res.data.room_id;
       dispatch({ type: INIT_WEBSOCKET, payload: roomId });
@@ -68,7 +91,7 @@ export const Home = () => {
       {!streamLoader || stream?.source ? (
         <Row>
           <Col>
-            <video
+            <canvas
               className="Home__video"
               height={resolution.height}
               width={resolution.width}
