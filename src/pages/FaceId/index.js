@@ -90,7 +90,10 @@ export const FaceId = () => {
   return (
     <div className="FaceId d-flex justify-content-center flex-column">
       <Row className="d-flex justify-content-center">
-        <Col className="justify-content-center align-items-center" xs={6}>
+        <Col
+          className="justify-content-center align-items-center"
+          md={6}
+          xs={12}>
           {faceIdCreated ? (
             <Fragment>
               <UserVideo />
@@ -116,6 +119,7 @@ export const FaceId = () => {
                 <Form.Group className="mb-3" controlId="formBasicEmail">
                   <Form.Label>Name</Form.Label>
                   <Form.Control
+                    required
                     type="text"
                     placeholder="Enter your name"
                     onChange={handleInputChange}
