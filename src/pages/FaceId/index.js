@@ -1,15 +1,14 @@
 import React, { Fragment, useEffect, useRef, useState } from 'react';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import './styles.scss';
 import { CANCEL_WEBSOCKET, INIT_WEBSOCKET } from '../../store/actionTypes';
 import { UserVideo } from '../../components/UserVideo';
-import { useParams } from 'react-router';
-import api from '../../api';
 
 export const FaceId = () => {
   const dispatch = useDispatch();
   const [faceIdCreated, setFaceIdCreated] = useState(false);
+  const [localStreamInterval, setLocalStreamInterval] = useState();
   const [input, setInput] = useState('');
   const [resolution, setResolution] = useState({
     width: 0,
@@ -17,8 +16,7 @@ export const FaceId = () => {
   });
   const liveVideoRef = useRef(null);
   const [liveStream, setLiveStream] = useState();
-  let { roomId } = useParams();
-  if (!roomId) roomId = 1;
+  const { currentRoomId: roomId } = useSelector(state => state.rooms);
 
   useEffect(() => {
     navigator.mediaDevices
@@ -27,28 +25,30 @@ export const FaceId = () => {
       })
       .then(stream => {
         setLiveStream(stream);
-        setInterval(async () => {
-          try {
-            if (stream) {
-              const [track] = stream.getVideoTracks();
-              const imageCapture = new ImageCapture(track);
-              const frame = await imageCapture.grabFrame();
-              setResolution(state => {
-                return {
-                  width: frame.width,
-                  height: frame.height
-                };
-              });
-              const canvas = liveVideoRef.current;
-              if (canvas) {
-                const context = canvas.getContext('2d');
-                context.drawImage(frame, 10, 10);
+        setLocalStreamInterval(() => {
+          return setInterval(async () => {
+            try {
+              if (stream) {
+                const [track] = stream.getVideoTracks();
+                const imageCapture = new ImageCapture(track);
+                const frame = await imageCapture.grabFrame();
+                setResolution(state => {
+                  return {
+                    width: frame.width,
+                    height: frame.height
+                  };
+                });
+                const canvas = liveVideoRef.current;
+                if (canvas) {
+                  const context = canvas.getContext('2d');
+                  context.drawImage(frame, 10, 10);
+                }
               }
+            } catch (err) {
+              console.log(err);
             }
-          } catch (err) {
-            console.log(err);
-          }
-        }, 1000 / 16);
+          }, 1000 / 16);
+        });
       });
   }, []);
 
@@ -66,6 +66,7 @@ export const FaceId = () => {
       //   frame
       // });
       setFaceIdCreated(true);
+      clearInterval(localStreamInterval);
     } catch (err) {
       console.log(err);
     }
