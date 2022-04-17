@@ -12,8 +12,12 @@ export const MainLayout = () => {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
               <NavDropdown title="Chatrooms" id="basic-nav-dropdown">
-                <NavDropdown.Item href="/rooms/1">Cute</NavDropdown.Item>
-                <NavDropdown.Item href="/rooms/4">Single</NavDropdown.Item>
+                <NavDropdown.Item href="/ovision-client/rooms/1">
+                  Cute
+                </NavDropdown.Item>
+                <NavDropdown.Item href="/ovision-client/rooms/4">
+                  Single
+                </NavDropdown.Item>
               </NavDropdown>
             </Nav>
           </Navbar.Collapse>
