@@ -1,26 +1,28 @@
 import { Home } from '../pages/Home';
 import { MainLayout } from '../layouts/MainLayout';
 import { Room } from '../pages/Room';
+import { FaceId } from '../pages/FaceId';
+import { Outlet } from 'react-router';
 // import { PrivateElement } from './PrivateElement';
-// import { Outlet } from 'react-router-dom';
 
 export const routes = [
   {
     path: '/',
-    element: <MainLayout />,
+    element: <Outlet />,
     children: [
       {
         path: '/',
-        element: <Home />
-        // Example usage of private elements
-        // element: <PrivateElement element={<AppLayout />} />,
-        // children: [
-        //   { path: '/', element: <Home /> },
-        // ]
+        element: <FaceId />
       },
       {
-        path: '/rooms/:roomId',
-        element: <Room />
+        path: '/',
+        element: <MainLayout />,
+        // Example usage of private elements
+        // element: <PrivateElement element={<AppLayout />} />,
+        children: [
+          { path: '/chat', element: <Home /> },
+          { path: '/rooms/:roomId', element: <Room /> }
+        ]
       }
     ]
   }

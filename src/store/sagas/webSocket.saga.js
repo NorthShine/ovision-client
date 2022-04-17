@@ -1,4 +1,4 @@
-import { call, put, take, all } from 'redux-saga/effects';
+import { call, put, take, all, cancelled } from 'redux-saga/effects';
 import { eventChannel, END } from 'redux-saga';
 import { setStreamSource } from '../actionCreators/stream.actionCreators';
 import { FPS } from '../../constants';
@@ -21,7 +21,7 @@ const createWebSocketConnection = roomId => {
   });
 };
 
-const initWebsocketChannel = (socket, roomId, wsTransferInverval, stream) => {
+const initWebsocketChannel = (socket, roomId, websocketState, stream) => {
   return eventChannel(emit => {
     // setInterval(() => {
     //   const result = window.btoa('ping');
@@ -40,30 +40,34 @@ const initWebsocketChannel = (socket, roomId, wsTransferInverval, stream) => {
       emit(END);
     };
 
-    wsTransferInverval.value = setInterval(async () => {
-      const [track] = stream.getVideoTracks();
-      const imageCapture = new ImageCapture(track);
-      const frame = await imageCapture.grabFrame();
-      const canvas = document.createElement('canvas');
-      canvas.width = frame.width;
-      canvas.height = frame.height;
-      const ctx = canvas.getContext('bitmaprenderer');
-      if (ctx) {
-        ctx.transferFromImageBitmap(frame);
-      } else {
-        canvas.getContext('2d').drawImage(frame, 0, 0);
-      }
-      canvas.toBlob(blob => {
-        if (socket.bufferedAmount < 2) {
-          socket.send(blob);
-          console.log('frame sent');
+    if (websocketState.cancel) {
+      websocketState.cancel = false;
+      clearInterval(websocketState.inverval);
+    } else {
+      websocketState.inverval = setInterval(async () => {
+        const [track] = stream.getVideoTracks();
+        const imageCapture = new ImageCapture(track);
+        const frame = await imageCapture.grabFrame();
+        const canvas = document.createElement('canvas');
+        canvas.width = frame.width;
+        canvas.height = frame.height;
+        const ctx = canvas.getContext('bitmaprenderer');
+        if (ctx) {
+          ctx.transferFromImageBitmap(frame);
+        } else {
+          canvas.getContext('2d').drawImage(frame, 0, 0);
         }
-      });
-    }, 1000 / FPS);
+        canvas.toBlob(blob => {
+          if (socket.bufferedAmount < 2) {
+            socket.send(blob);
+            console.log('frame sent');
+          }
+        });
+      }, 1000 / FPS);
+    }
 
     return () => {
       socket.onmessage = null;
-      clearInterval(wsTransferInverval.value);
     };
   });
 };
@@ -83,7 +87,7 @@ const createStream = async () => {
   }
 };
 
-export function* webSocketSaga(initAction, wsTransferInverval) {
+export function* webSocketSaga(initAction, websocketState) {
   try {
     const { payload: roomId } = initAction;
     const socket = yield call(createWebSocketConnection, roomId);
@@ -92,7 +96,7 @@ export function* webSocketSaga(initAction, wsTransferInverval) {
       initWebsocketChannel,
       socket,
       roomId,
-      wsTransferInverval,
+      websocketState,
       stream
     );
     while (true) {
@@ -101,5 +105,9 @@ export function* webSocketSaga(initAction, wsTransferInverval) {
     }
   } catch (err) {
     console.log(err);
+  } finally {
+    if (yield cancelled()) {
+      websocketState.cancel = true;
+    }
   }
 }

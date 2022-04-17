@@ -2,20 +2,17 @@ import { fork, take, cancel } from 'redux-saga/effects';
 import { CANCEL_WEBSOCKET, INIT_WEBSOCKET } from '../actionTypes';
 import { webSocketSaga } from './webSocket.saga';
 
-const wsTransferInverval = {
-  value: undefined
+export const websocketState = {
+  interval: undefined,
+  cancel: false
 };
 
 // eslint-disable-next-line
 export default function* () {
-  // grouping all sagas
-  // yield all([fork(webSocketSaga)]);
-
   const initAction = yield take(INIT_WEBSOCKET);
   while (initAction) {
-    const wsTask = yield fork(webSocketSaga, initAction, wsTransferInverval);
+    const wsTask = yield fork(webSocketSaga, initAction, websocketState);
     yield take(CANCEL_WEBSOCKET);
-    clearInterval(wsTransferInverval.value);
     yield cancel(wsTask);
   }
 }

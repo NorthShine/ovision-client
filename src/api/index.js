@@ -12,6 +12,10 @@ class Api {
   getRooms() {
     return this.fetcher.get('available_rooms');
   }
+
+  createFaceId(data) {
+    return this.fetcher.post('create_face_id', data);
+  }
 }
 
 export default new Api();
