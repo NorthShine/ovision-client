@@ -1,4 +1,4 @@
-import { call, put, take, all, select } from 'redux-saga/effects';
+import { call, put, take, all } from 'redux-saga/effects';
 import { eventChannel, END } from 'redux-saga';
 import { setStreamSource } from '../actionCreators/stream.actionCreators';
 import { FPS } from '../../constants';
@@ -83,11 +83,9 @@ const createStream = async () => {
   }
 };
 
-export function* webSocketSaga(wsTransferInverval) {
+export function* webSocketSaga(initAction, wsTransferInverval) {
   try {
-    const {
-      stream: { roomId }
-    } = yield select();
+    const { payload: roomId } = initAction;
     const socket = yield call(createWebSocketConnection, roomId);
     const stream = yield call(createStream);
     const webSocketChannel = yield call(

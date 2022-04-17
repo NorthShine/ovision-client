@@ -8,6 +8,10 @@ class Api {
   getUniqueRoomId() {
     return this.fetcher.get('unique_room_id');
   }
+
+  getRooms() {
+    return this.fetcher.get('available_rooms');
+  }
 }
 
 export default new Api();

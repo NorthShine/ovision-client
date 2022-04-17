@@ -19,7 +19,7 @@ export const routes = [
         // ]
       },
       {
-        path: '/:roomId',
+        path: '/rooms/:roomId',
         element: <Room />
       }
     ]

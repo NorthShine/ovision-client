@@ -1,0 +1,23 @@
+.UserVideo {
+  padding: 1rem;
+
+  .UserVideo__video {
+    width: 100%;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #e2e2e2;
+  }
+
+  .UserVideo__loader {
+    min-height: 500px;
+    min-width: 500px;
+    width: 100%;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #e2e2e2;
+  }
+}

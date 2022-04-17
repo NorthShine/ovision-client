@@ -12,11 +12,11 @@ export const MainLayout = () => {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
               <NavDropdown title="Chatrooms" id="basic-nav-dropdown">
-                <NavDropdown.Item href="/1">Cute</NavDropdown.Item>
-                <NavDropdown.Item href="/2">Gays</NavDropdown.Item>
-                <NavDropdown.Item href="/3">Fat</NavDropdown.Item>
+                <NavDropdown.Item href="/rooms/1">Cute</NavDropdown.Item>
+                <NavDropdown.Item href="/rooms/2">Gays</NavDropdown.Item>
+                <NavDropdown.Item href="/rooms/3">Fat</NavDropdown.Item>
                 <NavDropdown.Divider />
-                <NavDropdown.Item href="/4">Single</NavDropdown.Item>
+                <NavDropdown.Item href="/rooms/4">Single</NavDropdown.Item>
               </NavDropdown>
             </Nav>
           </Navbar.Collapse>
