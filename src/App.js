@@ -8,7 +8,7 @@ import { RoomProvider } from './providers/RoomProvider';
 
 function App() {
   return (
-    <Router basename="ovision-client">
+    <Router>
       <StateProvider store={store}>
         <RoomProvider>
           <LoaderProvider>
