@@ -31,7 +31,7 @@ export const UserVideo = () => {
 
   return (
     <div className="UserVideo d-flex justify-content-center flex-column">
-      {stream?.source ? (
+      {stream?.isRunning && stream?.source ? (
         <canvas
           className="UserVideo__video"
           height={resolution.height}

@@ -2,8 +2,13 @@ import React, { Fragment, useEffect, useRef, useState } from 'react';
 import { Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import './styles.scss';
-import { CANCEL_WEBSOCKET, INIT_WEBSOCKET } from '../../store/actionTypes';
+import {
+  CANCEL_WEBSOCKET,
+  INIT_WEBSOCKET,
+  SET_STREAM_RUNNING
+} from '../../store/actionTypes';
 import { UserVideo } from '../../components/UserVideo';
+import { websocketState } from '../../store/sagas';
 
 export const FaceId = () => {
   const dispatch = useDispatch();
@@ -55,9 +60,6 @@ export const FaceId = () => {
   const createFaceId = async event => {
     try {
       event.preventDefault();
-      if (!navigator.mediaDevices.getUserMedia) {
-        console.error('No getUserMedia method available');
-      }
       const [track] = liveStream.getVideoTracks();
       const imageCapture = new ImageCapture(track);
       const frame = await imageCapture.takePhoto();
@@ -74,6 +76,8 @@ export const FaceId = () => {
 
   const startWebsocket = async () => {
     try {
+      websocketState.value = true;
+      dispatch({ type: SET_STREAM_RUNNING, payload: true });
       dispatch({ type: INIT_WEBSOCKET, payload: roomId });
     } catch (err) {
       throw err;

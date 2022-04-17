@@ -1,12 +1,8 @@
-import { call, put, take, all, cancelled, select } from 'redux-saga/effects';
+import { call, put, take, all, cancelled } from 'redux-saga/effects';
 import { eventChannel, END } from 'redux-saga';
 import { setStreamSource } from '../actionCreators/stream.actionCreators';
 import { FPS } from '../../constants';
-import {
-  CANCEL_STREAM,
-  SET_STREAM_IS_RUNNING,
-  SET_CANCELLING
-} from '../actionTypes';
+import { SET_STREAM_RUNNING } from '../actionTypes';
 // import { Buffer } from 'buffer';
 
 const createWebSocketConnection = roomId => {
@@ -16,7 +12,6 @@ const createWebSocketConnection = roomId => {
     );
 
     socket.onopen = function () {
-      console.log('connection to ws');
       resolve(socket);
     };
 
@@ -27,7 +22,7 @@ const createWebSocketConnection = roomId => {
   });
 };
 
-const initWebsocketChannel = ({ isRunning, socket, stream }) => {
+const initWebsocketChannel = (socket, roomId, websocketState, stream) => {
   return eventChannel(emit => {
     // setInterval(() => {
     //   const result = window.btoa('ping');
@@ -46,8 +41,11 @@ const initWebsocketChannel = ({ isRunning, socket, stream }) => {
       emit(END);
     };
 
-    if (isRunning) {
-      setInterval(async () => {
+    if (websocketState.cancel) {
+      websocketState.cancel = false;
+      clearInterval(websocketState.inverval);
+    } else {
+      websocketState.inverval = setInterval(async () => {
         const [track] = stream.getVideoTracks();
         const imageCapture = new ImageCapture(track);
         const frame = await imageCapture.grabFrame();
@@ -90,37 +88,28 @@ const createStream = async () => {
   }
 };
 
-export function* webSocketSaga(initAction) {
+export function* webSocketSaga(initAction, websocketState) {
   try {
     const { payload: roomId } = initAction;
-    yield put({ type: SET_STREAM_IS_RUNNING, payload: true });
-    const state = yield select();
-    const { isRunning, isCancelling } = state.stream;
     const socket = yield call(createWebSocketConnection, roomId);
     const stream = yield call(createStream);
-
-    const webSocketChannel = yield call(initWebsocketChannel, {
-      isRunning,
+    const webSocketChannel = yield call(
+      initWebsocketChannel,
       socket,
+      roomId,
+      websocketState,
       stream
-    });
+    );
     while (true) {
-      console.log(isCancelling);
-      if (!isCancelling) {
-        const data = yield take(webSocketChannel);
-        yield all([put(setStreamSource(data))]);
-      } else {
-        yield put({ type: SET_CANCELLING, payload: false });
-      }
+      const data = yield take(webSocketChannel);
+      yield all([put(setStreamSource(data))]);
     }
   } catch (err) {
     console.log(err);
   } finally {
     if (yield cancelled()) {
-      yield all([
-        put({ type: CANCEL_STREAM }),
-        put({ type: SET_STREAM_IS_RUNNING, payload: false })
-      ]);
+      websocketState.cancel = true;
+      yield put({ type: SET_STREAM_RUNNING, payload: false });
     }
   }
 }

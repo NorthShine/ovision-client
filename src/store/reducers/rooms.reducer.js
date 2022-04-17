@@ -1,11 +1,11 @@
 import { SET_CURRENT_ROOM_ID, SET_ROOMS } from '../actionTypes';
 
-const initialStreamState = {
+const initialRoomState = {
   roomIds: [],
   currentRoomId: undefined
 };
 
-export const roomsReducer = (state = initialStreamState, action) => {
+export const roomsReducer = (state = initialRoomState, action) => {
   switch (action.type) {
     case SET_CURRENT_ROOM_ID:
       return {
