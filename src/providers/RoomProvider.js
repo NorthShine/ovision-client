@@ -6,14 +6,14 @@ import { SET_ROOMS } from '../store/actionTypes';
 export const RoomProvider = ({ children }) => {
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    api
-      .getRooms()
-      .then(res => {
-        dispatch({ type: SET_ROOMS, payload: res.data.rooms });
-      })
-      .catch(err => console.error(err));
-  }, []);
+  // useEffect(() => {
+  //   api
+  //     .getRooms()
+  //     .then(res => {
+  //       dispatch({ type: SET_ROOMS, payload: res.data.rooms });
+  //     })
+  //     .catch(err => console.error(err));
+  // }, []);
 
   return children;
 };

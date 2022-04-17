@@ -13,9 +13,6 @@ export const MainLayout = () => {
             <Nav className="me-auto">
               <NavDropdown title="Chatrooms" id="basic-nav-dropdown">
                 <NavDropdown.Item href="/rooms/1">Cute</NavDropdown.Item>
-                <NavDropdown.Item href="/rooms/2">Gays</NavDropdown.Item>
-                <NavDropdown.Item href="/rooms/3">Fat</NavDropdown.Item>
-                <NavDropdown.Divider />
                 <NavDropdown.Item href="/rooms/4">Single</NavDropdown.Item>
               </NavDropdown>
             </Nav>

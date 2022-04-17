@@ -19,7 +19,7 @@ export const routes = [
         // ]
       },
       {
-        path: '/rooms/:roomId',
+        path: '/ovision-client/rooms/:roomId',
         element: <Room />
       }
     ]
